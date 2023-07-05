@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 
-from time import time
 from librosa.feature import rms
 from torch import functional as F
 from pyannote.core import (
@@ -10,7 +9,6 @@ from pyannote.core import (
 )
 from einops import rearrange
 from scipy.signal import medfilt
-from sklearn import manifold
 
 
 POWER_REF_LEVEL = 20e-6  # audition threshold
@@ -74,46 +72,3 @@ def moving_median_filter(X: np.ndarray, n=5):
     elif len(X.shape) != 1:
         raise ValueError("Shape should be (n,) or (n,c)")
     return medfilt(X, kernel_size=n)
-
-
-def reduce_dimensionality(embeddings_ss, method="tsne", metric="cosine"):
-    """
-    Reduce embeddings dimensionality to 2D
-    """
-    t0 = time()
-    if method == "tsne":
-        trans_data = (
-            manifold.TSNE(n_components=2, perplexity=50, metric=metric, random_state=0)
-            .fit_transform(embeddings_ss)
-            .T
-        )
-    elif method == "mds":
-        trans_data = (
-            manifold.MDS(2, metric=metric, max_iter=100, n_init=1)
-            .fit_transform(embeddings_ss)
-            .T
-        )
-    # Doesn't support cosine distance?
-    # elif method == "lle":
-    #     trans_data = (
-    #         manifold.LocallyLinearEmbedding(
-    #             n_neighbors=30, n_components=2, method="standard"  # ltsa
-    #         )
-    #         .fit_transform(embeddings_ss)
-    #         .T
-    #     )
-    elif method == "isomap":
-        trans_data = (
-            manifold.Isomap(n_neighbors=30, n_components=2, metric=metric)
-            .fit_transform(embeddings_ss)
-            .T
-        )
-    # Doesn't support cosine distance?
-    # elif method == "spectral":
-    #     trans_data = (
-    #         manifold.SpectralEmbedding(n_neighbors=30, n_components=2)
-    #         .fit_transform(embeddings_ss)
-    #         .T
-    #     )
-    print(f"Dim reduction ({method}/{metric}) time: {(time() - t0):.2g} sec")
-    return trans_data
