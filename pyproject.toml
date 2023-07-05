@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "cad-predictor"
+version = "0.1.0"
+description = ""
+authors = ["Braulio Ríos <braulioriosf@gmail.com>"]
+license = "Creative Commons Zero v1.0 Universal"
+readme = "README.md"
+packages = [{include = "cad"}]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+torch = "1.13.1"
+numpy = "^1.23.2"
+torchaudio = ">=0.13.1"
+speechbrain = "^0.5.13"
+pandas = "^1.4.4"
+dynaconf = "^3.1.9"
+PyYAML = "^6.0"
+matplotlib = "^3.5.3"
+scipy = "1.8.1"
+numba = "^0.56.2"
+SoundFile = "^0.11.0"
+"pyannote.metrics" = "^3.2.1"
+opencv-python = "^4.6.0.66"
+seaborn = "^0.12.1"
+librosa = "^0.9.2"
+xgboost = "1.7.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.8.0"
+flake8 = "^5.0.4"
+ipykernel = "6.19.3"
+ipdb = "0.13.11"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

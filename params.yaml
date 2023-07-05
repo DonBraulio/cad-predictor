@@ -1,0 +1,170 @@
+general:
+  dev_dir: data/dev/
+  temp_dir: temp_outputs/
+  input_video_dir: data/raw_inputs
+  test_size: 0.5  # split 0
+
+audio:
+  input_dir: data/raw_inputs
+  save_dir: data/audio
+  sample_rate: 16000
+  silence_th_db: 30 # ~0.00065 rms
+  silence_win_s: 0.5
+
+labels:
+  input_dir: data/raw_inputs
+  save_dir: data/labels
+  analytics_dir: data/analytics/labels
+  fix_remap: { "x": "m" }
+  fix_filter: ["p", "l", "a", "g", "b", "c", "m", "o", "s", "r", "d"]
+  # Proportion of each label on train. See data_analysis.py
+  proportions:
+    m_labeled: 0.302986  # Fraction of labeled interval
+    m_audio: 0.245071  # Fraction over the entire audio
+    p_labeled: 0.610082
+    p_audio: 0.493466
+    a_labeled: 0.090704
+    a_audio: 0.073366
+    # Combined a+m
+    ma_labeled: 0.39369
+    ma_audio: 0.318437
+
+labels_comparison:
+  input_dir: data/dev/labels_comparison
+  save_dir: data/labels_eval
+  labelers: ["Diego", "Braulio", "Emilio"]
+  hop_s: 0.5
+  inputs:
+    comp_eng1:
+      name: Clasedeingles_Observacion_8276_REC-2022-06-23T18_30_02Z
+    comp_eng2:
+      name: "Grabacioninternadeclases-8249-2022-06-20T13_30_04Z"
+    comp_eng3:
+      name: "MasterLessonRecording-8288REC-2022-06-30T14_15_02Z"
+    comp_pc1:
+      name: PC_1101255_6A_06112019_REC-2019-11-06T12_25_00Z
+    comp_pc2:
+      name: PC_1101076_5B_14112019_REC-2019-11-14T17_15_00Z
+    comp_pc3:
+      name: PensamientoComputacional-2020-08-26T14_00_02Z
+
+classification:
+  use_labels: ["p", "l", "a", "g", "b", "c", "m", "o", "s"]
+  remap: { b: a, g: a }
+  # Used for general evaluation metrics
+  remap_coarse: { b: a, g: a, c: m, o: p, s: p, l: m }
+
+featurizer:
+  hop_len_ms: 15
+  win_len_ms: 30
+  f_min: 60
+  f_max: 8000
+  n_mels: 60
+  n_mfcc: 12
+  cache_dir: data/features/cache/
+  cache_expire_hours: 24
+  cache_max_size: 10
+
+diarization:
+  cache_dir: data/diarization/cache/
+  cache_expire_hours: 24
+  cache_max_size: 10
+
+  # Params in hf/pyannote/speaker-diarization/config.yaml
+  seg_model: "pyannote/segmentation@2022.07"
+  emb_model: "speechbrain/spkrec-ecapa-voxceleb"
+  clustering_algorithm: "AgglomerativeClustering"
+  embedding_exclude_overlap: true
+  clustering_method: "centroid"
+  clustering_min_size: 15
+  clustering_threshold: 0.7153814381597874
+  segmentation_min_duration_off: 0.5817029604921046
+  segmentation_threshold: 0.4442333667381752
+
+xgboost:
+  train_dir: data/xgboost/train/
+  context_window: 10
+  gamma: 0
+  max_depth: 6
+  # Fraction of train audio used for validation
+  validation_fraction: 0.2
+  labels_remap: { "a": "a", "b": "a", "g": "a", "l": "a", "x": "m" }
+
+lstm:
+  train_dir: data/lstm/train/
+  hidden_dim: 64
+  num_layers: 2
+  batch_size: 64
+  labels_remap: { "a": "a", "b": "a", "g": "a", "l": "a", "x": "m" }
+  frames_per_sample: 64  # stft windows per lstm sample
+  frames_hop_size: 16 # Only for train, in test hop=frames_per_sample
+  frames_label: 64
+  predict_hop_frames: 16
+  # Fraction of train audio used for validation
+  validation_fraction: 0.2
+
+outputs:
+  labels_order: ["p", "l", "a", "g", "b", "c", "m", "r", "s", "d", "n"]
+  video_width: 1280
+  segment_length: 30
+  density_window_s: 30
+  smooth_win_s: 1.5
+  color_style: dark
+  models_dir: data/models/
+  models_eval_dir: data/models_eval/
+  models_benchmark_dir: data/models_benchmark/
+  predictions_dir: data/predictions/
+  diariz_eval_dir: data/diarization_eval/
+  diariz_groups_test_dir: data/diarization_groups_test/
+  metrics_dir: data/metrics/
+  models_comparison_dir: data/models_comparison/
+  video_dir: data/output_videos/
+  cad_dir: data/outputs/cad/
+  raw_dir: data/outputs/raw/
+  smoothed_dir: data/outputs/smoothed/
+  eval_raw_dir: data/outputs/eval_raw/
+  eval_smoothed_dir: data/outputs/eval_smoothed/
+
+embeddings:
+  encoder: speechbrain/spkrec-ecapa-voxceleb
+  batch_size: 32
+  win_secs: 2.0
+  hop_secs: 2
+  label_overlap_th: 0.5
+  min_seg_length: 0.5
+
+styles:
+  dark:
+    style_mpl: dark_background
+    wv_signal: [242, 149, 0]
+    label_colors:
+      default: [100, 100, 100]
+      p: [100, 100, 255] # light-blue
+      l: [143, 0, 255] # violet
+      a: [255, 80, 80] # red
+      b: [255, 187, 150] # orange
+      g: [255, 150, 220] # pinkish
+      m: [255, 238, 150] # yellowish
+      c: [188, 255, 0] # lime green
+      r: [180, 180, 180] # light-grey
+      s: [220, 220, 220] # lighter-grey
+      d: [120, 120, 120] # darker-grey
+      n: [100, 100, 100] # Null label
+      "-": [100, 100, 100] # Null label
+  light:
+    wv_signal: [242, 149, 0] # check
+    label_colors:
+      default: [100, 100, 100]
+      p: [0, 0, 255] # blue
+      l: [143, 0, 255] # violet
+      a: [245, 150, 70] # orange
+      b: [245, 150, 115] # lighter orange
+      g: [255, 150, 220] # pinkish
+      m: [116, 152, 92] # green
+      c: [80, 100, 66] # darker green
+      r: [80, 80, 80] # dark-grey
+      s: [100, 100, 100] # light-grey
+      o: [200, 200, 0] # yellow
+      d: [130, 130, 130] # lighter-grey
+      n: [150, 150, 150] # very light
+      "-": [150, 150, 150] # same as n
