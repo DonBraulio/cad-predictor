@@ -1,6 +1,9 @@
 *.mp4
 *.wav
 *.csv
+*.png
+*.pdf
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

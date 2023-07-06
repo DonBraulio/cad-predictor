@@ -13,6 +13,33 @@ def win_density(boolean_array, win_size=10):
     return np.diff(boolean_array.cumsum()[::win_size]) / win_size
 
 
+def get_confusion_probs(df_preds, labels):
+    confusion_matrix_recall = np.empty((len(labels), len(labels)))
+    confusion_matrix_precision = np.empty((len(labels), len(labels)))
+    for ref_idx, ref_label in enumerate(labels):
+        for pred_idx, pred_label in enumerate(labels):
+            # Predicted confusion matrix
+            ref_mask = df_preds["reference"] == ref_label
+            pred_mask = df_preds["prediction"] == pred_label
+
+            # Count how many items we've in this cell (ref=ref_label, pred=pred_label)
+            hits_cell = ref_mask & pred_mask
+
+            # Bayes calculation for recall:
+            # P(pred=label | ref=label)
+            #   = P(pred=label & ref=label) / P(ref=label)
+            recall = hits_cell.sum() / ref_mask.sum()
+
+            # Bayes calculation for precision:
+            # P(ref=label | pred=label)
+            #   = P(pred=label & ref=label) / P(pred=label)
+            precision = hits_cell.sum() / pred_mask.sum()
+
+            confusion_matrix_recall[ref_idx][pred_idx] = recall
+            confusion_matrix_precision[ref_idx][pred_idx] = precision
+    return confusion_matrix_recall, confusion_matrix_precision
+
+
 def calculate_metrics(
     predictions: Union[pd.Series, np.ndarray],
     references: Union[pd.Series, np.ndarray],

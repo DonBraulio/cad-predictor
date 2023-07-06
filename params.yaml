@@ -18,6 +18,7 @@ featurizer:
 classification:
   use_labels: ["p", "l", "a", "g", "b", "c", "m", "o", "s"]
   remap: { b: a, g: a, c: m, o: p, s: p, l: m }
+  labels: ["p", "m", "a"]
 
 diarization:
   cache_enabled: false
