@@ -3,10 +3,11 @@ Scripts for running Classroom Activity Detection (teacher, student, multiple) ov
 
 ## Installing
 
-To install this package and all the required dependencies, just clone the repo and run:
+To install this package and all the required dependencies, make sure you've some version of python 3.10 installed, then clone the repo and run:
 
 ```shell
 $ cd cad-predictor
+$ poetry env use 3.10
 $ poetry install
 ```
 
