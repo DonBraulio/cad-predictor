@@ -20,16 +20,16 @@ from utils.annotations import NULL_LABEL, get_power_mask
 
 
 class CADPredictorXGB(CADPredictor):
-    def __init__(self, params_file: FilePath):
-        super().__init__(params_file)
+    def __init__(self, weights_file: FilePath, params_file: FilePath):
+        super().__init__(weights_file, params_file)
         self._silence_th = settings.AUDIO.SILENCE_TH_DB
 
-    def load_from_params(self, params_file: FilePath):
+    def load_from_params(self, weights_file: FilePath, params_file: FilePath):
         params = json.load(open(params_file, "r"))
         context_lr = params["context_window"]
         # Load pretrained model
         self._model = xgb.Booster({"nthread": 1})
-        self._model.load_model(params["best_checkpoint"])
+        self._model.load_model(weights_file)
         self._feature_names = self._model.feature_names
         self.featurizer = AudioFeaturizer(verbose=True)
         self._compute_cw = ContextWindow(

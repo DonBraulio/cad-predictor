@@ -29,8 +29,8 @@ from utils.annotations import NULL_LABEL, discretize_annotations, get_power_mask
 
 
 class CADPredictorDiarization(CADPredictor):
-    def __init__(self, params_file: FilePath, use_cache=True):
-        super().__init__(params_file)
+    def __init__(self, weights_file: FilePath, params_file: FilePath, use_cache=True):
+        super().__init__(weights_file, params_file)
         self._silence_th = settings.AUDIO.SILENCE_TH_DB
         self._fs = settings.AUDIO.SAMPLE_RATE
         self.cache = None
@@ -41,7 +41,7 @@ class CADPredictorDiarization(CADPredictor):
                 expire_secs=settings.DIARIZATION.CACHE_EXPIRE_HOURS * 3600,
             )
 
-    def load_from_params(self, params_file: FilePath):
+    def load_from_params(self, weights_file: FilePath, params_file: FilePath):
         params = json.load(open(params_file, "r"))
 
         seg_device, emb_device = get_devices(needs=2)

@@ -5,11 +5,8 @@ from pathlib import Path
 from typing import Mapping, Union, List, Optional, Iterable, Dict
 
 from pyannote.core import Segment, Annotation, Timeline, SlidingWindowFeature
-from pyannote.audio.core.io import Audio
 
-from .misc import str_to_seconds
 from .features import s_power_db
-from config import settings
 
 NULL_LABEL = "-"
 

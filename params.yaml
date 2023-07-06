@@ -15,6 +15,10 @@ featurizer:
   cache_expire_hours: 24
   cache_max_size: 10
 
+classification:
+  use_labels: ["p", "l", "a", "g", "b", "c", "m", "o", "s"]
+  remap: { b: a, g: a, c: m, o: p, s: p, l: m }
+
 diarization:
   cache_enabled: false
   cache_dir: data/diarization/cache/

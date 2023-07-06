@@ -18,19 +18,15 @@ from utils.annotations import NULL_LABEL, get_power_mask
 
 
 class CADPredictorLSTM(CADPredictor):
-    def __init__(self, params_file: FilePath):
-        super().__init__(params_file)
+    def __init__(self, weights_file, params_file: FilePath):
+        super().__init__(weights_file, params_file)
         self._silence_th = settings.AUDIO.SILENCE_TH_DB
         self._hop_frames = settings.LSTM.PREDICT_HOP_FRAMES
 
-    def load_from_params(self, params_file: FilePath):
+    def load_from_params(self, weights_file: FilePath, params_file: FilePath):
         params = json.load(open(params_file, "r"))
         lstm_params = params["lstm_params"]
-        best_checkpoint = params["best_checkpoint"]
-        print(f"Loading pretrained LSTM from: {best_checkpoint}")
-        audio_lstm = AudioClassifier.load_model(
-            best_checkpoint, AudioLSTM(**lstm_params)
-        )
+        audio_lstm = AudioClassifier.load_model(weights_file, AudioLSTM(**lstm_params))
         audio_lstm.eval()
 
         # Loaded instance

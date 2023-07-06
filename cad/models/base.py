@@ -12,22 +12,24 @@ Predictor = T.TypeVar("Predictor", bound="CADPredictor")
 
 
 class CADPredictor(ABC):
-    def __init__(self, params_file: FilePath):
+    def __init__(self, weights_file: FilePath, params_file: FilePath):
         self.featurizer = None
-        self.load_from_params(params_file)
+        self.load_from_params(weights_file, params_file)
 
     @staticmethod
-    def create_instance(model_path: str, params_file: FilePath) -> Predictor:
+    def create_instance(
+        model_path: str, weights_file: FilePath, params_file: FilePath
+    ) -> Predictor:
         # Find class and read params
         class_name = model_path.split(".")[-1]
         model_path = ".".join(model_path.split(".")[:-1])
 
         # Import and instantiate class
         Klass = getattr(import_module(model_path), class_name)
-        return Klass(params_file)
+        return Klass(weights_file, params_file)
 
     @abstractmethod
-    def load_from_params(self, params_file: FilePath) -> None:
+    def load_from_params(self, weights_file: FilePath, params_file: FilePath) -> None:
         """
         Read the params file and assign whatever variables are
         needed to initialize this model instance
