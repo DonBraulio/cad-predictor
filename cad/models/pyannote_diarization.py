@@ -34,7 +34,7 @@ class CADPredictorDiarization(CADPredictor):
         self._silence_th = settings.AUDIO.SILENCE_TH_DB
         self._fs = settings.AUDIO.SAMPLE_RATE
         self.cache = None
-        if use_cache:
+        if use_cache and settings.DIARIZATION.CACHE_ENABLED:
             self.cache = DiarizationCache(
                 cache_dir=settings.DIARIZATION.CACHE_DIR,
                 max_size=settings.DIARIZATION.CACHE_MAX_SIZE,

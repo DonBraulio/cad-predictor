@@ -98,12 +98,13 @@ class AudioFeaturizer:
             print(msg)
 
     def setup_cache(self, enable=True):
-        self.cache = enable
+        self.cache = enable and settings.FEATURIZER.CACHE_ENABLED
         self.cache_dir = Path(settings.FEATURIZER.CACHE_DIR)
         self.cache_expire_seconds = 3600 * settings.FEATURIZER.CACHE_EXPIRE_HOURS
         self.cache_max_size = settings.FEATURIZER.CACHE_MAX_SIZE
-        self.cache_dir.mkdir(parents=True, exist_ok=True)
-        self._clean_cache()
+        if self.cache:
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
+            self._clean_cache()
 
     def clear_cache(self):
         n_audios = len(list(self.cache_dir.glob("*_map.json")))
