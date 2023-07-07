@@ -99,7 +99,10 @@ class AudioClassifier(pl.LightningModule):
 
     @staticmethod
     def load_model(checkpoint_path, model):
-        checkpoint = torch.load(checkpoint_path)
+        checkpoint = torch.load(
+            checkpoint_path,
+            map_location=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
+        )
         model_weights = checkpoint["state_dict"]
         # update keys by dropping `model.` (used in AudioClassifier)
         for key in list(model_weights):

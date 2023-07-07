@@ -11,6 +11,17 @@ $ poetry env use 3.10
 $ poetry install
 ```
 
+If the poetry installation of some package (aka `hmmlearn`) fails, install it manually with `pip` and then repeat the poetry install:
+
+```shell
+$ poetry install  # Fails at some point
+
+$ poetry shell
+$ pip install "hmmlearn==0.2.8"
+
+$ poetry install  # Should work now
+```
+
 ## Usage
 
 Before running any command, make sure to activate the virtualenv where the dependencies are installed:
