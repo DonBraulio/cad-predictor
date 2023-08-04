@@ -21,10 +21,12 @@ from utils.annotations import (
     NULL_LABEL,
     discretize_annotations,
     load_annotations_csv,
+    save_annotations_csv,
     remap_labels_df,
+    list_to_annotation,
 )
 
-
+# %%
 # Command line params
 try:
     parser = argparse.ArgumentParser()
@@ -120,8 +122,24 @@ df_predictions = pd.DataFrame(
 df_predictions = remap_labels_df(df_predictions, remap, col="reference", inplace=False)
 remap_labels_df(df_predictions, remap, col="prediction", inplace=True)
 
-df_predictions.round(2).to_csv(f"output_{audio_path.stem}.csv")
+# %%
+# Smooth predictions by using a moving window and majority voting
+s_labels = df_predictions["prediction"].reset_index(drop=True)
+win_s = 1.0
+win_len = int(win_s / hop_s)
+s_smoothed = s_labels.groupby(s_labels.index // win_len).apply(
+    lambda group: group.mode().iloc[0]
+)
+hop_smoothed = win_len * hop_s  # may differ from win_s
 
+# No smoothing
+anns = list_to_annotation(df_predictions["prediction"], hop_s)
+
+# %%
+# Convert to annotations and save CSV
+anns_smoothed = list_to_annotation(s_smoothed, hop_smoothed)
+out_filepath = f"output_{audio_path.stem}.csv"
+save_annotations_csv(anns_smoothed, out_filepath)
 
 # %%
 # Create output image (density function)
