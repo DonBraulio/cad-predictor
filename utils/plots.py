@@ -1,18 +1,8 @@
 import numpy as np
-import typing as T
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from matplotlib.ticker import NullFormatter
-from matplotlib.axes import Axes
-from plotly import graph_objects as go
-from pyannote.core import Segment, notebook
-
-from pyannote.metrics.diarization import DiarizationErrorRate
 from config import settings
-from utils.metrics import IoMin, win_density
-from utils.vscode_audio import display_segment
-from utils.annotations import NULL_LABEL
 
 fs = settings.AUDIO.SAMPLE_RATE
 light_colors = settings.STYLES.LIGHT

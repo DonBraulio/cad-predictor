@@ -16,3 +16,6 @@ librosa>=0.9.2
 xgboost==1.7.2
 soundfile==0.10.2
 pyannote-audio>=2.1.1
+matplotlib_inline
+ipython
+rich

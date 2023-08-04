@@ -27,4 +27,7 @@ $ . .venv/bin/activate
 
 # Run on provided sample or any other path/to/video.mp4
 $ python predict.py sample.mp4
+
+# Create an output video 😎
+$ python predict.py sample.mp4 --create_video
 ```

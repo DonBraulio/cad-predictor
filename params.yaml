@@ -52,6 +52,7 @@ lstm:
 
 outputs:
   video_width: 1280
+  labels_order: ["p", "a", "m", "s", "n"]
   segment_length: 30
   density_window_s: 30
   smooth_win_s: 1.5

@@ -40,17 +40,22 @@ try:
     parser.add_argument(
         "--labels", default="", help="File with manual ground-truth CAD labels."
     )
+    parser.add_argument(
+        "--create_video", action="store_true", help="Create output video"
+    )
     args = parser.parse_args()
-    input_path = args.filename
+    input_video = args.filename
     labels_path = args.labels
     model_weights = args.weights
     model_params = args.params
+    create_video = args.create_video
 except:  # noqa. Notebook mode
-    input_path = "sample.mp4"
+    input_video = "sample.mp4"
     labels_path = ""
     model_weights = "lstm.ckpt"
     model_params = "lstm.json"
-input_path = Path(input_path)
+    create_video = True
+input_video = Path(input_video)
 
 # Config params
 use_labels = settings.CLASSIFICATION.USE_LABELS
@@ -59,10 +64,10 @@ labels = settings.CLASSIFICATION.LABELS
 win_density_s = settings.OUTPUTS.DENSITY_WINDOW_S
 
 # Convert mp4 -> wav if needed
-audio_path = input_path.with_suffix(".wav")
-if input_path.suffix == ".mp4":
+audio_path = input_video.with_suffix(".wav")
+if input_video.suffix == ".mp4":
     cmd = cmd_mp4_to_wav(
-        input_path,
+        input_video,
         audio_path,
         sample_rate=settings.AUDIO.SAMPLE_RATE,
     )
@@ -77,8 +82,8 @@ if input_path.suffix == ".mp4":
         print(err_msg)
         print(f"[red]Check msg above, process ended with error code: {ret_code}[/red]")
         raise ValueError(f"Error code: {ret_code}")
-elif input_path.suffix != ".wav":
-    raise ValueError(f"Only WAV or MP4 files are supported. Got: {input_path.suffix}")
+elif input_video.suffix != ".wav":
+    raise ValueError(f"Only WAV or MP4 files are supported. Got: {input_video.suffix}")
 
 
 # Instantiate model
@@ -141,8 +146,8 @@ anns_smoothed = list_to_annotation(s_smoothed, hop_smoothed)
 out_filepath = f"output_{audio_path.stem}.csv"
 save_annotations_csv(anns_smoothed, out_filepath)
 
+
 # %%
-# Create output image (density function)
 def get_density(df_preds, label, remove_null=False):
     hop_s = df_preds.iloc[1]["t"] - df_preds.iloc[0]["t"]
     win_len = round(win_density_s // hop_s)
@@ -159,22 +164,24 @@ def get_density(df_preds, label, remove_null=False):
     )
 
 
-def show_predictions(df_preds, remove_nulls=False):
+def show_predictions(t_density, label_densities):
     sns.set_palette("muted")
     fig, axes = plt.subplots(nrows=3, figsize=(8, 4.5), sharex=True)
     colors = sns.color_palette()
     for idx, label in enumerate(labels):
+        density_ref, density_pred = label_densities[label]
         ax = axes[idx]
-        density_ref, density_pred = get_density(
-            df_preds, label, remove_null=remove_nulls
-        )
-        t = np.arange(len(density_pred)) * win_density_s
         color = colors[idx]
         ax.plot(
-            t, density_ref, label=f"{label} (ref)", alpha=1, linestyle="-", color=color
+            t_density,
+            density_ref,
+            label=f"{label} (ref)",
+            alpha=1,
+            linestyle="-",
+            color=color,
         )
         ax.plot(
-            t,
+            t_density,
             density_pred,
             label=f"{label} (pred)",
             alpha=0.8,
@@ -188,8 +195,23 @@ def show_predictions(df_preds, remove_nulls=False):
     ax.set_xlabel("t (s)")
 
 
-show_predictions(df_predictions)
+label_densities = {}
+for label in labels:
+    d_ref, d_pred = get_density(df_predictions, label, remove_null=False)
+    label_densities[label] = (d_ref, d_pred)
+    density_len = len(d_ref)
+
+t_density = np.linspace(start=0, stop=df_predictions.iloc[-1]["t"], num=density_len)
+show_predictions(t_density, label_densities)
 plt.savefig(f"out_density_{audio_path.stem}.pdf")
 plt.savefig(f"out_density_{audio_path.stem}.png")
 
 # %%
+if create_video:
+    from utils.video import create_video
+
+    out_video = f"out_{input_video.stem}.mp4"
+    print("[red]Creating output video with predictions...[/red]")
+    create_video(
+        anns_smoothed, label_densities, t_density, audio_t, input_video, out_video
+    )
