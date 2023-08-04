@@ -27,7 +27,7 @@ def get_label_weights(annotations: Annotation, use_labels: List = None):
 
 
 def list_to_annotation(
-    labels: Iterable, hop_s: np.float, ignore_label=NULL_LABEL
+    labels: Iterable, hop_s: float, ignore_label=NULL_LABEL
 ) -> Annotation:
     """
     Convert discrete labels to annotation
