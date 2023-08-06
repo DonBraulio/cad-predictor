@@ -163,11 +163,15 @@ def load_annotations_csv(
     return df_to_annotation(df)
 
 
-def save_annotations_csv(annotation: Annotation, file_path: Union[Path, str]):
+def save_annotations_csv(
+    annotation: Annotation, file_path: Union[Path, str], sep=" ", header=[]
+):
     with open(file_path, "w") as f:
+        if header:
+            f.write(sep.join(header) + "\n")
         for segment, _, label in annotation.itertracks(yield_label=True):
             f.write(
-                f"{segment.start:.3f} {segment.start + segment.duration:.3f} {label}\n"
+                f"{segment.start:.3f}{sep}{segment.start + segment.duration:.3f}{sep}{label}\n"
             )
 
 

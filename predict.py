@@ -143,8 +143,10 @@ anns = list_to_annotation(df_predictions["prediction"], hop_s)
 # %%
 # Convert to annotations and save CSV
 anns_smoothed = list_to_annotation(s_smoothed, hop_smoothed)
-out_filepath = f"output_{audio_path.stem}.csv"
-save_annotations_csv(anns_smoothed, out_filepath)
+out_filepath = f"out_{audio_path.stem}.csv"
+save_annotations_csv(
+    anns_smoothed, out_filepath, sep=",", header=["t_start", "t_end", "cad"]
+)
 
 
 # %%
