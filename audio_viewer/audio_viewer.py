@@ -182,7 +182,7 @@ class AudioViewer:
         )
         # Don't use rich.print because there might be []
         builtins.print(" ".join(cmd_encode))
-        exit_code, error_msg = run_command(cmd_encode, exec_timeout=600)
+        exit_code, error_msg = run_command(cmd_encode, exec_timeout=1800)
         if exit_code:
             print(error_msg)
             raise ValueError("An error ocurred during video encoding")
